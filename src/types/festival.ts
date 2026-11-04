@@ -1,0 +1,31 @@
+export interface Festival {
+  id: string;
+  title: string;
+  startDate: string;
+  endDate: string;
+  addr: string;
+  sido: string;
+  sigungu: string;
+  lat: number | null;
+  lng: number | null;
+  image: string | null;
+  thumb: string | null;
+  images: string[];
+  tel: string;
+  overview: string;
+  homepage: string | null;
+  place: string;
+  playtime: string;
+  fee: string;
+  ageLimit: string;
+  program: string;
+  subevent: string;
+  spendTime: string;
+  sponsor: string;
+  sponsorTel: string;
+  copyright: string;
+  modifiedAt: string;
+  tags: string[];
+  months: string[];
+  nearby: string[];
+}

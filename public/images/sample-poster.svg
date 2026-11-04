@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="720" viewBox="0 0 960 720">
+  <rect width="960" height="720" fill="#f2e3d2"/>
+  <circle cx="740" cy="160" r="110" fill="#b53d23"/>
+  <path d="M0 600 180 300 390 600 610 250 960 720H0Z" fill="#d5b894"/>
+  <path d="m690 350 20 60 60 20-60 20-20 60-20-60-60-20 60-20z" fill="#b53d23"/>
+  <g fill="#3b3029" font-family="sans-serif"><text x="70" y="125" font-size="22" letter-spacing="5">CHUKJEON · SAMPLE ONLY</text><text x="70" y="220" font-size="62" font-weight="700">가을의 한 장면</text><text x="70" y="280" font-size="26">실제 축제 포스터가 아닌 개발용 일러스트입니다</text></g>
+</svg>

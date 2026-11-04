@@ -1,0 +1,30 @@
+---
+import type { Festival } from '../types/festival';
+import { festivalStatus } from '../lib/dates';
+import { buildDate } from '../lib/festivals';
+import { festivalPresentation } from '../lib/site-config';
+interface Props { festival: Festival; eager?: boolean; featured?: boolean }
+const { festival: f, eager = false, featured = false } = Astro.props;
+const view = festivalPresentation(f);
+const status = festivalStatus(f.startDate, f.endDate, buildDate);
+const period = `${f.startDate.slice(5).replace('-', '.')} — ${f.endDate.slice(5).replace('-', '.')}`;
+---
+<article class:list={['card', { featured }]}>
+  <a href={`/f/${f.id}/`} aria-label={`${f.title} 상세 보기`}>
+    <div class="card-cover">
+      {view.image ? <img src={view.image} alt="" width="640" height="480" loading={eager ? 'eager' : 'lazy'} decoding="async" /> :
+        <div class:list={['cover-placeholder', f.tags.includes('야간') ? 'night' : 'nature']} aria-hidden="true"><span>✳</span><b>축제ON</b></div>}
+      <span class:list={['badge', { ongoing: status === '진행중' }]} data-start={f.startDate} data-end={f.endDate}>{status}</span>
+      {featured && <>
+        <div class="featured-visual-text"><span>THIS MONTH’S PICK</span><p>가을을 오래<br />기억하는 방법</p></div>
+        <span class="feature-arrow"><svg aria-hidden="true"><use href="#i-arrow" /></svg></span>
+      </>}
+    </div>
+    <p class="card-place"><svg aria-hidden="true"><use href="#i-pin" /></svg>{view.region}</p>
+    <h3>{f.title}</h3>
+    <div class:list={{ 'featured-bottom': featured }}>
+      <p class="card-date">{period}</p>
+      <div class="card-tags">{f.tags.slice(0, 2).map(tag => <span>#{tag}</span>)}</div>
+    </div>
+  </a>
+</article>

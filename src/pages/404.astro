@@ -1,0 +1,9 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { siteConfig } from '../lib/site-config';
+---
+<BaseLayout title="페이지를 찾을 수 없어요 | 축제on">
+  <header class="header"><a href="/" class="brand" aria-label="축제ON 홈"><img src="/images/logo.png" width="142" height="47" alt="축제ON" /></a></header>
+  <main id="main" class="not-found"><section class="empty-state"><span aria-hidden="true">✳</span><h1>이 길에는 축제가 없네요</h1><p>주소를 확인하거나 이번 달 축제를 둘러보세요.</p><a class="primary-button" href="/">이번 달 축제 보기</a></section></main>
+  <footer class="footer">{siteConfig.sampleMode && <div class="disclaimer">샘플 데이터 · 실제 행사 정보가 아닙니다.</div>}</footer>
+</BaseLayout>

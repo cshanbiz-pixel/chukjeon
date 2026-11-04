@@ -1,0 +1,6 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MonthView from '../components/MonthView.astro';
+import { currentMonth } from '../lib/festivals';
+---
+<BaseLayout title="이번 달 축제 | 축제on"><MonthView month={currentMonth} /></BaseLayout>

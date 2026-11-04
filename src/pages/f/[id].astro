@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FestivalCard from '../../components/FestivalCard.astro';
+import { festivals, buildDate } from '../../lib/festivals';
+import { period, monthPath, festivalStatus } from '../../lib/dates';
+import { siteConfig, festivalPresentation, displayValue } from '../../lib/site-config';
+export function getStaticPaths() {
+  return festivals.map(festival => ({ params: { id: festival.id }, props: { festival } }));
+}
+const { festival: f } = Astro.props;
+const view = festivalPresentation(f);
+const status = festivalStatus(f.startDate, f.endDate, buildDate);
+const nearby = f.nearby.map(id => festivals.find(item => item.id === id))
+  .filter((value): value is typeof f => Boolean(value)).slice(0, 4);
+const info = [['운영시간', f.playtime], ['이용요금', f.fee], ['참여대상', f.ageLimit], ['소요시간', f.spendTime], ['주최', f.sponsor]];
+const programs = f.program.split('\n').filter(line => /^\d{2}:\d{2}/.test(line)).map(line => ({ time: line.slice(0, 5), title: line.slice(5).trim() }));
+---
+<BaseLayout title={`${f.title} | 축제on`} description={f.overview}>
+  <header class="header detail-header">
+    <a class="icon-button" href={monthPath(f.months[0])} aria-label="목록으로 돌아가기"><svg aria-hidden="true"><use href="#i-left" /></svg></a>
+    <a href="/" class="brand" aria-label="축제ON 홈"><img src="/images/logo.png" width="126" height="42" alt="축제ON" /></a>
+    {siteConfig.sampleMode ? <span class="demo-pill">DESIGN</span> : <span></span>}
+  </header>
+  <main id="main">
+    <section aria-label="축제 상세">
+      <div class="detail-cover">
+        {view.detailImage ? <img src={view.detailImage} width="960" height="720" alt={`${f.title}${siteConfig.sampleMode ? ' 분위기 참고 이미지' : ''}`} decoding="async" /> : <div class="cover-placeholder nature" aria-hidden="true"><span>✳</span><b>축제ON</b></div>}
+        {siteConfig.sampleMode && <span class="image-note">축제 분위기 참고 이미지</span>}
+      </div>
+      <div class="detail-content">
+        <p class="ended-notice" id="ended-notice" hidden={buildDate <= f.endDate}>종료된 축제입니다. 다른 축제의 일정도 확인해 보세요.</p>
+        <div class="detail-badges"><span class:list={['badge', { ongoing: status === '진행중' }]} id="detail-status" data-start={f.startDate} data-end={f.endDate}>{status}</span>{f.fee.includes('무료') && <span class="badge free-badge">무료 입장</span>}{siteConfig.sampleMode && <span class="detail-sample">가상 축제</span>}</div>
+        <h1 class="detail-title">{f.title}</h1>
+        <p class="detail-subtitle">{view.subtitle}</p>
+        <!-- 3단계에서 구현: 상세 해시태그 선택/목록 이동. 현재 동작 없음. -->
+        <div class="detail-tags">{f.tags.map(tag => <button type="button" aria-disabled="true">#{tag}</button>)}</div>
+        <div class="visit-summary">
+          <div class="visit-row"><svg aria-hidden="true"><use href="#i-calendar" /></svg><div><strong>{period(f.startDate, f.endDate)}</strong>{siteConfig.sampleMode && <small>{f.startDate.slice(0, 4)}년 {Number(f.startDate.slice(5, 7))}월 가상 일정</small>}</div></div>
+          <div class="visit-row"><svg aria-hidden="true"><use href="#i-pin" /></svg><div><strong>{view.region} · {f.place}</strong>{siteConfig.sampleMode && <small>실제로 존재하지 않는 샘플 행사 장소입니다</small>}</div></div>
+          <div class="visit-row"><svg aria-hidden="true"><use href="#i-ticket" /></svg><div><strong>{displayValue(f.fee)}</strong>{siteConfig.sampleMode && <small>가상 요금 · 실제 방문·예약에 사용하지 마세요</small>}</div></div>
+        </div>
+        <section class="detail-block"><h2>이런 하루가 기다려요</h2><p>{siteConfig.sampleMode ? `${view.subtitle} 천천히 걷고, 잠시 쉬어가며 계절이 건네는 작은 즐거움을 만나보세요.` : f.overview}</p>
+          <!-- 3단계에서 구현: 소개 펼치기. 현재 동작 없음. -->
+          <button type="button" class="story-more" aria-disabled="true"><span aria-hidden="true">▸</span> 축제 이야기 더 보기</button>
+        </section>
+        <section class="detail-block"><h2>방문 전 확인하세요</h2><dl class="info-table">{info.map(([label, value]) => <div><dt>{label}</dt><dd>{displayValue(value) || '정보 준비 중'}</dd></div>)}{f.tel && <div><dt>전화</dt><dd><a href={`tel:${f.tel}`}>{f.tel}</a></dd></div>}{f.homepage && <div><dt>홈페이지</dt><dd><a href={f.homepage} target="_blank" rel="noopener noreferrer">공식 홈페이지 ↗</a></dd></div>}</dl></section>
+        <section class="detail-block"><h2>작은 즐거움을 골라보세요</h2>{programs.length ? programs.map(item => <div class="program-item"><span>{item.time}</span><div><strong>{item.title}</strong>{siteConfig.sampleMode && <small>{item.time === '11:00' ? '가족과 함께하는 느긋한 시간' : item.time === '14:00' ? '작은 소품 만들기 체험' : '하루를 마무리하는 따뜻한 선율'}</small>}</div></div>) : <p class="preserve-lines">{f.program || '정보 준비 중'}</p>}{f.subevent && <p class="subevent">{f.subevent}</p>}</section>
+        <section class="detail-block"><h2>여기서 만나요</h2>
+          <!-- 3단계에서 구현: 실제 좌표 기반 지도/길찾기. 현재는 지도 디자인만 표시. -->
+          <div class="map-card" role="img" aria-label="실제 지도가 아닌 장소 안내 디자인"><div class="map-pin"><svg aria-hidden="true"><use href="#i-pin" /></svg></div><span class="map-label">지도 디자인 예시 · 실제 지도 아님</span></div>
+          <p class="address-label">{view.region} · {f.place}</p>
+        </section>
+        {nearby.length > 0 && <section class="detail-block"><h2>함께 가볼 축제</h2><div class="related-grid">{nearby.map(festival => <FestivalCard festival={festival} />)}</div></section>}
+        <footer class="detail-source">{siteConfig.sampleMode ? <>샘플 데이터 · 실제로 개최되지 않는 가상 축제입니다.<br />사진: Unsplash 분위기 참고 이미지 · TourAPI 미연결<br />표시된 일정·요금·프로그램은 모두 샘플입니다.</> : <>{f.copyright && <>이미지 저작권: {f.copyright}<br /></>}수정일: {f.modifiedAt.slice(0, 10)}</>}</footer>
+      </div>
+    </section>
+  </main>
+  <!-- 3단계에서 구현: Web Share/링크 복사, ICS 다운로드, 지도 앱 선택. 현재 모두 동작 없음. -->
+  <div class="bottom-action">
+    <button type="button" class="secondary-action" aria-disabled="true"><svg aria-hidden="true"><use href="#i-share" /></svg><span>공유</span></button>
+    <button type="button" class="secondary-action" aria-disabled="true"><svg aria-hidden="true"><use href="#i-calendar" /></svg><span>일정 저장</span></button>
+    <button type="button" class="direction-action" aria-disabled="true"><svg aria-hidden="true"><use href="#i-pin" /></svg>길찾기</button>
+  </div>
+</BaseLayout>
+<script>
+  // 1단계의 날짜 배지만 갱신합니다. 하단 액션/태그/더보기는 3단계에서 구현.
+  import { seoulToday, festivalStatus } from '../../lib/dates';
+  function updateStatuses() {
+    const today = seoulToday();
+    document.querySelectorAll<HTMLElement>('[data-start][data-end]').forEach(badge => {
+      const { start, end } = badge.dataset;
+      if (!start || !end) return;
+      badge.textContent = festivalStatus(start, end, today);
+      badge.classList.toggle('ongoing', start <= today && today <= end);
+    });
+    const badge = document.getElementById('detail-status');
+    const notice = document.getElementById('ended-notice');
+    if (notice && badge?.dataset.end) notice.hidden = today <= badge.dataset.end;
+  }
+  updateStatuses();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) updateStatuses(); });
+  window.setInterval(updateStatuses, 60_000);
+</script>

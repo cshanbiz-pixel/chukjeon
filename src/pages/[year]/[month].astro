@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MonthView from '../../components/MonthView.astro';
+import { availableMonths } from '../../lib/festivals';
+import { monthLabel } from '../../lib/dates';
+export function getStaticPaths() {
+  return availableMonths.map(month => ({
+    params: { year: month.slice(0, 4), month: month.slice(5) }, props: { month },
+  }));
+}
+const { month } = Astro.props;
+---
+<BaseLayout title={`${monthLabel(month)} 축제 | 축제on`}><MonthView month={month} /></BaseLayout>
